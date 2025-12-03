@@ -1,0 +1,2 @@
+Este directorio contendrá los documentos para ser indexados por el sistema RAG.
+Coloque aquí sus archivos .pdf, .txt o .md.

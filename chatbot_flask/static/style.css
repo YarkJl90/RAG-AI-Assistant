@@ -1,0 +1,525 @@
+/* =====================================
+   RESET & GLOBAL
+===================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background: #f4f1ea url("images/bg.jpg") center/cover fixed no-repeat;
+    color: #111;
+    overflow-x: hidden;
+}
+
+/* =====================================
+   WRAPPERS
+===================================== */
+
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+}
+
+.chat-shell {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    height: auto !important;
+}
+
+
+/* =====================================
+   BRAND CHIP (TOP)
+===================================== */
+
+.top-bar {
+    padding: 18px 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.brand-chip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    padding: 10px 18px;
+    border-radius: 60px;
+    box-shadow: 0 14px 40px rgba(0,0,0,.18);
+}
+
+.brand-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.brand-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.brand-tagline {
+    font-size: 10px;
+    opacity: .7;
+    text-transform: uppercase;
+}
+
+/* =====================================
+   CHAT CARD
+===================================== */
+
+/* Header interno */
+.chat-card-header {
+    background: linear-gradient(90deg, #f6f6fa, #ffffff);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 10px 14px;
+    border-radius: 999px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.chat-header-icon {
+    font-size: 20px;
+}
+
+.chat-header-title {
+    font-weight: 600;
+}
+
+.chat-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    overflow-y: auto;
+    max-height: 70vh; /* muy importante */
+    padding-right: 4px;
+    padding-left: 4px;
+}
+
+.chat-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+/* =====================================
+   BURBUJAS DE MENSAJE
+===================================== */
+
+.bot-message {
+    max-width: 78%;
+    background: #f7f8fc;
+    padding: 16px 20px;
+    border-radius: 20px;
+    color: #222;
+    font-size: 15px;
+    line-height: 1.55;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    animation: fadeIn .18s ease-out;
+}
+
+.user-message {
+    max-width: 72%;
+    align-self: flex-end;
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 22px;
+    font-size: 15px;
+    line-height: 1.55;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+    animation: fadeIn .18s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================
+   INPUT
+===================================== */
+
+.input-row {
+    display: flex;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    margin-top: 12px;
+}
+
+.input-box {
+    flex: 1;
+    padding: 14px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    font-size: 15px;
+    background: #fafafa;
+    transition: .2s ease;
+}
+
+.input-box:focus {
+    background: #fff;
+    outline: none;
+    border-color: #999;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.12);
+}
+
+.send-btn {
+    background: #000;
+    border: none;
+    border-radius: 999px;
+    padding: 0 28px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.send-btn:hover {
+    background: #333;
+}
+
+.send-btn:active {
+    transform: scale(0.96);
+}
+
+/* =====================================
+   TYPING INDICATOR
+===================================== */
+
+.typing-indicator {
+    background: #f6f7fb;
+    padding: 8px 12px;
+    border-radius: 999px;
+    display: flex;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* =====================================
+   SIDEBAR (ChatGPT Pro Style)
+===================================== */
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    z-index: 800;
+}
+
+.settings-overlay.show {
+    display: block;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 340px;
+    max-width: 90vw;
+    background: #0d1117;
+    color: #fff;
+    padding: 24px 20px;
+    transform: translateX(-100%);
+    transition: transform .32s ease;
+    box-shadow: 18px 0 45px rgba(0,0,0,0.45);
+    overflow-y: auto;
+    z-index: 900;
+}
+
+/* abierto */
+.sidebar.open {
+    transform: translateX(0);
+}
+
+/* Header sidebar */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-close {
+    background: transparent;
+    border: none;
+    font-size: 26px;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* contenido */
+.sidebar-content {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.param-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.param-block span {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.sidebar select,
+.sidebar input[type="number"] {
+    background: #0a0f18;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 10px 10px;
+    border-radius: 8px;
+}
+
+.sidebar input[type="range"] {
+    width: 100%;
+    accent-color: #ff7a7a;
+}
+
+.slider-value {
+    text-align: right;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.sidebar-divider {
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    margin: 10px 0;
+}
+
+.sidebar-btn {
+    background: #1f2937;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.sidebar-btn:hover {
+    background: #374151;
+}
+
+.primary-btn {
+    background: #111 !important;
+    border-color: #222 !important;
+}
+
+.primary-btn:hover {
+    background: #000 !important;
+}
+
+.danger-btn {
+    background: #7f1d1d !important;
+    border-color: #991b1b !important;
+}
+
+.danger-btn:hover {
+    background: #b91c1c !important;
+}
+
+/* switch */
+.switch {
+    position: relative;
+    width: 44px;
+    height: 22px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #555;
+    border-radius: 22px;
+    transition: .2s ease;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: white;
+    transition: .2s ease;
+}
+
+.switch input:checked + .slider {
+    background: #4ade80;
+}
+
+.switch input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+/* =====================================
+   HAMBURGER BUTTON
+===================================== */
+
+.hamburger-btn {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    width: 44px;
+    height: 44px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    border: none;
+    border-radius: 999px;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    z-index: 950;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.40);
+}
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 768px) {
+    .chat-card {
+        padding: 16px 16px;
+        border-radius: 22px;
+    }
+
+    .bot-message,
+    .user-message {
+        max-width: 90%;
+        font-size: 14px;
+    }
+
+    .sidebar {
+        width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-shell {
+        padding: 10px;
+    }
+
+    .chat-card {
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+    .brand-chip {
+        padding: 8px 14px;
+        gap: 8px;
+    }
+
+    .brand-name {
+        font-size: 14px;
+    }
+
+    .brand-tagline {
+        font-size: 9px;
+    }
+
+    .sidebar {
+        width: 240px;
+    }
+}
+
+/* =============================
+   FIX: HIDE HAMBURGER WHEN SIDEBAR OPEN
+   ============================= */
+.sidebar.open ~ .hamburger-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.7);
+}
+
+/* Opcional: mover un poco la X si querés más separación */
+.sidebar .sidebar-close {
+    margin-left: 6px;
+}
+
+/* =============================
+   FIX: WHATSAPP / CHATGPT TYPING INDICATOR
+============================= */
+
+.typing-indicator {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.08);        /* más visible */
+    padding: 10px 14px;
+    border-radius: 16px;
+    width: fit-content;
+    animation: fadeIn .2s ease-out;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typingAnim 1.3s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingAnim {
+    0%   { opacity: 0.3; transform: translateY(0); }
+    50%  { opacity: 1; transform: translateY(-4px); }
+    100% { opacity: 0.3; transform: translateY(0); }
+}
+

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MÁQUINA KANIKI</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- ==========================
+         OVERLAY
+    ============================= -->
+    <div id="settings-overlay" class="settings-overlay"></div>
+
+
+    <!-- ==========================
+         SIDEBAR (ChatGPT PRO STYLE)
+    ============================= -->
+    <div id="sidebar" class="sidebar">
+
+        <div class="sidebar-header">
+            <button id="close-sidebar" class="sidebar-close">✕</button>
+            <h2>Parameter Control</h2>
+        </div>
+
+        <div class="sidebar-content">
+
+            <!-- Model -->
+            <label class="param-block">
+                <span>Model</span>
+                <select id="param-model">
+                    <option value="gpt-4o-mini" selected>gpt-4o-mini</option>
+                    <option value="gpt-4o">gpt-4o</option>
+                </select>
+            </label>
+
+            <!-- Temperature -->
+            <label class="param-block">
+                <span>Temperature</span>
+                <input type="range" id="param-temperature" min="0" max="1" step="0.01" value="0.65">
+                <span id="param-temperature-value" class="slider-value">0.65</span>
+            </label>
+
+            <!-- Max tokens -->
+            <label class="param-block">
+                <span>Max Tokens</span>
+                <input type="number" id="param-max-tokens" min="32" max="4096" value="250">
+            </label>
+
+            <!-- Frequency -->
+            <label class="param-block">
+                <span>Frequency Penalty</span>
+                <input type="range" id="param-frequency" min="0" max="2" step="0.1" value="0">
+                <span id="param-frequency-value" class="slider-value">0</span>
+            </label>
+
+            <!-- Presence -->
+            <label class="param-block">
+                <span>Presence Penalty</span>
+                <input type="range" id="param-presence" min="0" max="2" step="0.1" value="0">
+                <span id="param-presence-value" class="slider-value">0</span>
+            </label>
+
+            <!-- Profile -->
+            <label class="param-block">
+                <span>Profile</span>
+                <select id="param-profile">
+                    <option value="custom" selected>Custom</option>
+                    <option value="actuarial">Actuarial Analyst</option>
+                    <option value="underwriting">AI Underwriting</option>
+                    <option value="ideation">Creative Ideation</option>
+                    <option value="executive">Executive Summary</option>
+                </select>
+            </label>
+
+            <hr class="sidebar-divider">
+
+            <!-- Memory Toggle -->
+            <div class="param-block toggle-row">
+                <span>Memory</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-memory" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Clear Memory -->
+            <button id="btn-clear-memory" class="sidebar-btn danger-btn">Clear Memory</button>
+
+            <hr class="sidebar-divider">
+
+            <!-- RAG CONFIG -->
+            <div class="rag-section">
+                <div class="rag-title">RAG Configuration</div>
+
+                <label class="param-block">
+                    <span>Search Depth</span>
+                    <input type="number" id="rag-depth" value="3" min="1" max="10">
+                </label>
+
+                <label class="param-block">
+                    <span>Top-K Results</span>
+                    <input type="number" id="rag-topk" value="5" min="1" max="20">
+                </label>
+
+                <label class="param-block">
+                    <span>Enable RAG</span>
+                    <label class="switch">
+                        <input type="checkbox" id="rag-enabled">
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            </div>
+
+            <hr class="sidebar-divider">
+
+            <!-- Dark Mode -->
+            <div class="param-block toggle-row">
+                <span>Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-theme" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <!-- Save -->
+            <button id="btn-save-settings" class="sidebar-btn primary-btn">Save Settings</button>
+
+            <!-- Reset UI -->
+            <button id="btn-reset-ui" class="sidebar-btn">Reset UI</button>
+
+        </div>
+    </div>
+
+
+    <!-- ==========================
+         HAMBURGER BUTTON
+    ============================= -->
+    <button id="open-sidebar" class="hamburger-btn">≡</button>
+
+
+    <!-- ==========================
+         MAIN CHAT CONTENT
+    ============================= -->
+    <div class="page-wrapper chat-wrapper">
+
+        <!-- Branding Chip -->
+        <header class="top-bar">
+            <div class="brand-chip">
+                <div class="brand-avatar">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}">
+                </div>
+                <div class="brand-text">
+                    <div class="brand-name">Máquina KANIKI</div>
+                    <div class="brand-tagline">AI Assistant</div>
+                </div>
+            </div>
+        </header>
+                
+         <div id="chat-container" class="chat-container"></div>
+             <div id="typing-indicator" class="typing-indicator" style="display:none;">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+
+                <!-- INPUT -->
+                <div class="input-row">
+                    <input id="user-input" type="text" class="input-box" placeholder="Type your message...">
+                    <button id="send-btn" class="send-btn">Send</button>
+                </div>
+
+            </section>
+        </main>
+
+    </div>
+
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

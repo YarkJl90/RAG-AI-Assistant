@@ -1,0 +1,34 @@
+# Flask and Web Server
+flask
+
+# OpenAI API
+openai
+
+# Environment Variables
+python-dotenv
+
+# --- LangChain Core & Components ---
+# Core framework
+langchain
+# ChromaDB integration
+langchain-chroma
+# Common community integrations (loaders, embeddings)
+langchain-community
+# Text splitters
+langchain-text-splitters
+
+# --- Vectorstore & Embeddings ---
+# Vector database
+chromadb
+# Sentence Transformers for embeddings
+sentence-transformers
+# PDF document loader dependency
+pypdf
+
+# --- Other Utilities ---
+# Convert Markdown to HTML
+Markdown
+# Language detection
+langdetect
+# Token counting for language models
+tiktoken
