@@ -22,7 +22,7 @@ logging.basicConfig(
 # --- Constantes ---
 DOCUMENTS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "documents"))
 VECTORSTORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "vectorstore"))
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
@@ -50,12 +50,13 @@ def load_documents() -> List[Dict]:
             if filename.lower().endswith(".pdf"):
                 loader = PyPDFLoader(filepath)
                 pages = loader.load()
-                for i, page in enumerate(pages):
-                    docs.append({
-                        "text": page.page_content,
-                        "source": f"{filename} (página {i+1})"
-                    })
-                logging.info(f"Cargado {len(pages)} páginas de {filename}")
+                # Concatenar todas las páginas en un solo texto
+                full_text = "\n".join([page.page_content for page in pages])
+                docs.append({
+                    "text": full_text,
+                    "source": filename
+                })
+                logging.info(f"Cargado y concatenado {len(pages)} páginas de {filename}")
 
             elif filename.lower().endswith((".txt", ".md")):
                 loader = TextLoader(filepath, encoding="utf-8")

@@ -18,7 +18,7 @@ logging.basicConfig(
 
 # --- Constantes ---
 VECTORSTORE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "vectorstore"))
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
 
 class RAGSystem:
     """
@@ -37,7 +37,7 @@ class RAGSystem:
                 "El sistema RAG no estará disponible hasta que se construya el índice. "
                 f"Directorio esperado: {VECTORSTORE_DIR}"
             )
-            self.vectorstore = None  # Asegurarse de que el vectorstore esté inactivo
+            self.vectorstore = None 
             return
         
         try:
@@ -59,17 +59,10 @@ class RAGSystem:
         logging.info("Iniciando recarga manual del sistema RAG...")
         self._load_vectorstore()
 
-    def rag_search(self, query: str, top_k: int = 5) -> List[Dict]:
+    # --- CORRECCIÓN AQUÍ: Agregado score_threshold ---
+    def rag_search(self, query: str, top_k: int = 5, score_threshold: float = 0.6) -> List[Dict]:
         """
         Realiza una búsqueda de similitud en la base de datos de vectores.
-
-        Args:
-            query (str): La consulta para la búsqueda.
-            top_k (int): El número de resultados a devolver.
-
-        Returns:
-            List[Dict]: Una lista de diccionarios con los resultados.
-                        Devuelve una lista vacía si el RAG no está disponible o no hay resultados.
         """
         if self.vectorstore is None:
             logging.warning("Intento de búsqueda RAG, pero el vectorstore no está cargado.")
@@ -80,12 +73,21 @@ class RAGSystem:
             top_k = 5
 
         try:
-            logging.info(f"Realizando búsqueda RAG para la consulta: '{query}' con top_k={top_k}")
+            logging.info(f"Realizando búsqueda RAG: '{query}' (top_k={top_k}, threshold={score_threshold})")
             
             results = self.vectorstore.similarity_search_with_score(query, k=top_k)
             
+            # --- Filtro de umbral dinámico ---
+            # Usamos el score_threshold que viene como argumento (por defecto 0.6)
+            filtered_results = [res for res in results if res[1] <= score_threshold]
+            
+            logging.info(
+                f"Búsqueda RAG: {len(results)} hallazgos brutos. "
+                f"{len(filtered_results)} pasaron el filtro (score <= {score_threshold})"
+            )
+
             formatted_results = []
-            for doc, score in results:
+            for doc, score in filtered_results:
                 formatted_results.append({
                     "text": doc.page_content,
                     "source": doc.metadata.get("source", "N/A"),
@@ -93,7 +95,6 @@ class RAGSystem:
                     "score": score
                 })
             
-            logging.info(f"Búsqueda RAG completada. Se encontraron {len(formatted_results)} resultados.")
             return formatted_results
 
         except Exception as e:
@@ -101,34 +102,27 @@ class RAGSystem:
             return []
 
 # --- Instancia única del sistema RAG ---
-# Se inicializa cuando se importa el módulo para que esté lista para usarse.
 rag_system = RAGSystem()
 
-def rag_search(query: str, top_k: int = 5) -> List[Dict]:
+# --- CORRECCIÓN AQUÍ TAMBIÉN ---
+def rag_search(query: str, top_k: int = 5, score_threshold: float = 0.6) -> List[Dict]:
     """
     Función de conveniencia para llamar al método de búsqueda del sistema RAG.
     """
-    return rag_system.rag_search(query=query, top_k=top_k)
+    # Pasamos el score_threshold a la clase
+    return rag_system.rag_search(query=query, top_k=top_k, score_threshold=score_threshold)
 
 if __name__ == '__main__':
-    # --- Ejemplo de uso y prueba ---
     print("--- Probando el sistema RAG ---")
     if rag_system.vectorstore is None:
-        print("\nEl sistema RAG no está disponible. Asegúrate de haber ejecutado rag_build.py primero.")
+        print("\nEl sistema RAG no está disponible.")
     else:
         test_query = "inteligencia artificial"
-        print(f"\nRealizando una búsqueda de prueba con la consulta: '{test_query}'")
-        
-        search_results = rag_search(test_query, top_k=3)
+        # Prueba con threshold personalizado
+        search_results = rag_search(test_query, top_k=3, score_threshold=0.8)
 
         if search_results:
-            print("\nResultados de la búsqueda:")
             for res in search_results:
-                print(f"  - Fuente: {res['source']}")
-                print(f"    Chunk ID: {res['chunk_id']}")
-                print(f"    Score: {res['score']:.4f}")
-                print(f"    Texto: '{res['text'][:100]}...'")
-                print("-" * 20)
+                print(f" - [{res['score']:.4f}] {res['source']}: {res['text'][:50]}...")
         else:
-            print("\nNo se encontraron resultados para la consulta de prueba.")
-            print("Asegúrate de que los documentos en la carpeta /documents contengan información relevante.")
+            print("\nNo se encontraron resultados.")

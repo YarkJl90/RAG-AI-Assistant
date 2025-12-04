@@ -207,4 +207,8 @@ marimo/_lsp/
 __marimo__/
 
 # Carpeta de archivos descartados
-project_trash/
+project_trash/.env
+chat_memory.db
+vectorstore/
+__pycache__/
+documents/

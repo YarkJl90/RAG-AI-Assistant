@@ -7,6 +7,9 @@ openai
 # Environment Variables
 python-dotenv
 
+# Gemini API
+google-generativeai
+
 # --- LangChain Core & Components ---
 # Core framework
 langchain
