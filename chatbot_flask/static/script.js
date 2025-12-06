@@ -3,6 +3,7 @@ const i18n = {
     es: {
         param_control: "Control de Parámetros",
         language_label: "Idioma de la App / IA",
+        theme_label: "Tema de Color",
         profile_label: "Perfil (Persona)",
         temp_label: "Temperatura / Creatividad",
         tokens_label: "Máx Tokens (Longitud)",
@@ -20,6 +21,7 @@ const i18n = {
     en: {
         param_control: "Parameter Control",
         language_label: "App / AI Language",
+        theme_label: "Color Theme",
         profile_label: "Profile (Persona)",
         temp_label: "Temperature / Creativity",
         tokens_label: "Max Tokens (Length)",
@@ -37,6 +39,7 @@ const i18n = {
     pt: {
         param_control: "Controle de Parâmetros",
         language_label: "Idioma do App / IA",
+        theme_label: "Tema de Cores",
         profile_label: "Perfil (Persona)",
         temp_label: "Temperatura / Criatividade",
         tokens_label: "Máx Tokens (Comprimento)",
@@ -61,48 +64,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const openBtn = document.getElementById("open-sidebar");
     const closeBtn = document.getElementById("close-sidebar");
     
-    // Referencias para Idioma
     const langSelect = document.getElementById("app-language");
     const userInput = document.getElementById("user-input");
     const typingSpan = document.querySelector("#typing-indicator span");
 
-    // --- LÓGICA DE IDIOMA (NUEVO) ---
+    // ==========================================
+    // 🎨 LÓGICA DE TEMAS (COLOR SWITCHING)
+    // ==========================================
+    const themeBtns = document.querySelectorAll(".theme-btn");
+    
+    function setTheme(themeName) {
+        if (themeName === 'default') {
+            document.documentElement.removeAttribute('data-theme');
+        } else {
+            document.documentElement.setAttribute('data-theme', themeName);
+        }
+
+        themeBtns.forEach(btn => {
+            if (btn.getAttribute("data-theme") === themeName) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        localStorage.setItem("kaniki_theme", themeName);
+    }
+
+    const savedTheme = localStorage.getItem("kaniki_theme") || "default";
+    setTheme(savedTheme);
+
+    themeBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const theme = btn.getAttribute("data-theme");
+            setTheme(theme);
+        });
+    });
+
+    // ==========================================
+    // 🌐 LÓGICA DE IDIOMA
+    // ==========================================
     function updateLanguage(lang) {
-        // 1. Traducir textos estáticos con atributo data-i18n
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (i18n[lang][key]) {
                 el.textContent = i18n[lang][key];
             }
         });
-
-        // 2. Traducir atributos específicos (placeholder)
         if (userInput) userInput.placeholder = i18n[lang].placeholder;
-
-        // 3. Traducir indicador de "Thinking..."
         if (typingSpan) typingSpan.textContent = i18n[lang].thinking;
-        
-        // 4. Guardar preferencia en el navegador
         localStorage.setItem("kaniki_lang", lang);
     }
 
-    // Inicializar idioma (guardado o por defecto 'es')
     if (langSelect) {
         const savedLang = localStorage.getItem("kaniki_lang") || "es";
         langSelect.value = savedLang;
         updateLanguage(savedLang);
-
-        // Evento al cambiar el selector
         langSelect.addEventListener("change", (e) => {
             updateLanguage(e.target.value);
         });
     }
 
-    // --- Sidebar Toggle ---
+    // ==========================================
+    // ↔️ LÓGICA DE SIDEBAR INTELIGENTE (FIX)
+    // ==========================================
     function toggleSidebar() {
-        sidebar.classList.toggle("open");
-        overlay.classList.toggle("show");
+        const isMobile = window.innerWidth <= 800; // Coincide con CSS media query
+
+        if (isMobile) {
+            // En móvil: Se usa .open para mostrarlo (por defecto está oculto)
+            sidebar.classList.toggle("open");
+            overlay.classList.toggle("show");
+        } else {
+            // En escritorio: Se usa .closed para colapsarlo (por defecto está visible)
+            sidebar.classList.toggle("closed");
+        }
     }
+
     if(openBtn) openBtn.addEventListener("click", toggleSidebar);
     if(closeBtn) closeBtn.addEventListener("click", toggleSidebar);
     if(overlay) overlay.addEventListener("click", toggleSidebar);
@@ -130,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if(e.key === "Enter") sendMessage();
     });
 
-    // --- Botones Acción ---
     document.getElementById("btn-clear-memory").addEventListener("click", () => {
         const currentLang = document.getElementById("app-language").value;
         fetch("/reset", { method: "POST" })
@@ -141,8 +178,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-reset-ui").addEventListener("click", () => {
         const currentLang = document.getElementById("app-language").value;
         if(confirm(i18n[currentLang].reset_confirm)) {
-            // Borramos preferencia y recargamos
             localStorage.removeItem("kaniki_lang");
+            localStorage.removeItem("kaniki_theme");
             window.location.reload();
         }
     });
@@ -153,22 +190,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// --- RECOLECTAR TODOS LOS PARÁMETROS (Actualizado con Idioma) ---
+// --- RECOLECTAR PARÁMETROS ---
 function getModelParameters() {
     return {
         model: document.getElementById("param-model").value,
         profile: document.getElementById("param-profile").value,
-        
         temperature: parseFloat(document.getElementById("param-temperature").value),
         max_tokens: parseInt(document.getElementById("param-max-tokens").value),
         frequency_penalty: parseFloat(document.getElementById("param-frequency").value),
         presence_penalty: parseFloat(document.getElementById("param-presence").value),
-        
         rag_enabled: document.getElementById("rag-enabled").checked,
         rag_topk: parseInt(document.getElementById("rag-topk").value),
         rag_depth: parseInt(document.getElementById("rag-depth").value),
-        
-        // ¡IMPORTANTE! Enviamos el idioma seleccionado al backend
         language: document.getElementById("app-language").value 
     };
 }
@@ -178,11 +211,15 @@ function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
 
+    // Mensaje del usuario (Instantáneo)
     addMessage(text, "user-message");
     input.value = "";
 
     const typing = document.getElementById("typing-indicator");
     typing.style.display = "flex";
+    
+    const container = document.getElementById("chat-container");
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
 
     const params = getModelParameters();
 
@@ -204,7 +241,8 @@ function sendMessage() {
     })
     .then((data) => {
         typing.style.display = "none";
-        addMessage(data.reply, "bot-message", true);
+        // Mensaje del bot con EFECTO DE ESCRITURA (animate = true)
+        addMessage(data.reply, "bot-message", true, true);
     })
     .catch((err) => {
         typing.style.display = "none";
@@ -212,17 +250,61 @@ function sendMessage() {
     });
 }
 
-function addMessage(text, className, isHTML = false) {
+// 🔥 FUNCIÓN PREMIUM: EFECTO TYPEWRITER 🔥
+async function typeWriterHTML(element, html) {
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    async function typeNode(node, target) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent;
+            for (let i = 0; i < text.length; i++) {
+                target.textContent += text[i];
+                const container = document.getElementById("chat-container");
+                container.scrollTop = container.scrollHeight;
+                
+                await new Promise(resolve => setTimeout(resolve, 10)); 
+            }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const newElement = document.createElement(node.tagName);
+            Array.from(node.attributes).forEach(attr => {
+                newElement.setAttribute(attr.name, attr.value);
+            });
+            target.appendChild(newElement);
+            
+            const childNodes = Array.from(node.childNodes);
+            for (const child of childNodes) {
+                await typeNode(child, newElement);
+            }
+        }
+    }
+
+    const childNodes = Array.from(tempDiv.childNodes);
+    for (const node of childNodes) {
+        await typeNode(node, element);
+    }
+}
+
+// --- ADD MESSAGE ACTUALIZADO ---
+function addMessage(text, className, isHTML = false, animate = false) {
     const container = document.getElementById("chat-container");
     const div = document.createElement("div");
     div.className = `message ${className}`;
     
-    if (isHTML) {
-        div.innerHTML = text;
+    container.appendChild(div);
+
+    if (animate && isHTML) {
+        div.classList.add("cursor-blink"); 
+        typeWriterHTML(div, text).then(() => {
+            div.classList.remove("cursor-blink"); 
+        });
     } else {
-        div.textContent = text;
+        if (isHTML) {
+            div.innerHTML = text;
+        } else {
+            div.textContent = text;
+        }
     }
     
-    container.appendChild(div);
     container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
 }
